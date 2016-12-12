@@ -1,4 +1,5 @@
 bookmark() {
+    [[ ! -f "$MARKPATH" ]] && return 0
     if (( $# == 0 )); then
         # When no arguments are provided, just display existing
         # bookmarks

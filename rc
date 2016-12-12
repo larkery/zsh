@@ -1,7 +1,6 @@
 # nixos terminal login does not do this
 # for reasons which escape me.
-if [[ -z $SOURCED_PROFILE ]]; then
-    echo "sourcing profile..."
+if [[ -z $SOURCED_PROFILE ]] && [[ -f "$HOME/profile" ]]; then
     source $HOME/.profile
 fi
 
@@ -120,8 +119,8 @@ case $TERM in
         if [[ -d $ZSH/eterm ]]; then
             fpath=( $ZSH/eterm "${fpath[@]}" )
             autoload -Uz $ZSH/eterm/*(:t)
-            _eterm_update
             add-zsh-hook precmd _eterm_update
+            _eterm_update
         fi
         ;;
 esac
