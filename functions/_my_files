@@ -1,0 +1,6 @@
+_my_files () {
+    _named_directories
+    values=(${${(f)"$(cdr -l)"}##<-> ##})
+    values=(${values[1,9]})
+    _wanted -V recent-dirs expl 'recent directory' compadd -S '' -Q -a values
+}

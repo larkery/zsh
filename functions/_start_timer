@@ -1,0 +1,3 @@
+_start_timer () {
+    _STARTED=$(date +%s)
+}

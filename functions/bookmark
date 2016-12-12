@@ -1,0 +1,39 @@
+bookmark() {
+    if (( $# == 0 )); then
+        # When no arguments are provided, just display existing
+        # bookmarks
+
+        for line in ${(f)"$(<$MARKPATH)"}; do
+            dir=(${(z)line})
+            local markname=(${(Q)${dir[1]}})
+            local markpath=(${(Q)${dir[2]}})
+            printf "$fg[green]%-30s$reset_color -> $fg[blue]%s$reset_color\n" $markname $markpath
+        done
+    else
+        # Otherwise, we may want to add a bookmark or delete an
+        # existing one.
+        local -a edit
+        local -a load
+        zparseopts -D e=edit l=load
+        if (( $+edit[1] )); then
+            $EDITOR -- "$MARKPATH"
+        elif (( $+load[1] )); then
+            hash -d -r
+            for line in ${(f)"$(<$MARKPATH)"}; do
+                dir=(${(z)line})
+                local markname=(${(Q)${dir[1]}})
+                local markpath=(${(Q)${dir[2]}})
+                hash -d -- ${markname}=${markpath}
+            done
+        else
+            # Otherwise, add a bookmark to the current
+            # directory. The first argument is the bookmark
+            # name. `.` is special and means the bookmark should
+            # be named after the current directory.
+            local name=$1
+            [[ $name == "." ]] && name=${PWD:t}
+            print -r "${(qqqq)name} ${(qqqq)PWD}" >> $MARKPATH
+            hash -d -- -${name}=${PWD}
+        fi
+    fi
+}

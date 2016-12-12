@@ -1,0 +1,6 @@
+_eterm_update() {
+   printf '\033AnSiTu %s\n' "$USER"
+   printf '\033AnSiTh %s\n' "$(hostname)"
+   printf '\033AnSiTc %s\n' "$PWD"
+}
+_eterm_update

@@ -1,0 +1,13 @@
+_set_title () {
+    name="${1:-%~}"
+    if [[ -n "$terminfo[fsl]" ]] && [[ -n "$terminfo[tsl]" ]]; then
+        echoti tsl
+        print -Pn "$name"
+        echoti fsl
+    fi
+    case "$TERM" in tmux*|screen*)
+        printf '\033k%s\033\\' $(print -Pn "$name")
+    esac
+}
+
+_set_title

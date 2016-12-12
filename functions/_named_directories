@@ -1,0 +1,19 @@
+_named_directories () {
+        [[ -n "$compstate[quote]" ]] && return 1
+        local expl suf ret=1 
+        if [[ "$SUFFIX" = */* ]]
+        then
+                ISUFFIX="/${SUFFIX#*/}$ISUFFIX" 
+                SUFFIX="${SUFFIX%%/*}" 
+                suf=(-S '') 
+        else
+                suf=(-qS/) 
+        fi
+        _tags named-directories
+        while _tags
+        do
+                _requested named-directories expl 'named directory' compadd -P '~' "$suf[@]" "$@" -k nameddirs '~' && ret=0 
+                (( ret )) || return 0
+        done
+        return ret
+}

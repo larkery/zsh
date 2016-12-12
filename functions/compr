@@ -1,0 +1,28 @@
+compr () {
+   input="$1"
+   output="${2:-${input}.tgz}"
+
+   [ -z "$1" ] && echo "usage: compr <input> [output]" && return 1
+
+   echo "compress $input => $output"
+
+   case "$output" in
+      *.tgz)
+        tar pcf - "$input" | pv -s $(du -sb "$input" | awk '{print $1}') | gzip > "$output"
+      ;;
+      *.tbz)
+        tar pcf - "$input" | pv -s $(du -sb "$input" | awk '{print $1}') | bipz2 > "$output"
+      ;;
+      *.tar.pigz)
+        tar pcf - "$input" | pv -s $(du -sb "$input" | awk '{print $1}') | pigz > "$output"
+      ;;
+      *.zip)
+        files=$(find "$input" -type f | wc -l)
+        zip --symlinks -r "$output" "$input" | pv -p -a -t -e -l -s $files > /dev/null
+      ;;
+      *)
+        echo "wat"
+        exit 1
+      ;;
+   esac
+}
