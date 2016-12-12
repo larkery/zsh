@@ -74,17 +74,15 @@ case $TERM in
         PROMPT='%~ %(?,,[%?] )$ '
     ;;
     *)
-        PROMPT='$(_cd_destination)'"\${vcs_info_msg_0_}
+        PROMPT=''
+        if [[ -n "$SSH_CLIENT" ]]; then
+            PROMPT=$PROMPT'%U%m%u '
+        fi
+        if [[ ! -z $IN_NIX_SHELL ]]; then
+            PROMPT=$PROMPT'N '
+        fi
+        PROMPT=$PROMPT'%B%~%b'"\${vcs_info_msg_0_}
 %B%(?,,%F{red}[%?]%f )$%b "
-
-        _cd_destination() {
-            if [[ "$BUFFER" =~ '^\.\./?' ]]; then
-                P=$(realpath -sLm "${PWD}/$BUFFER")
-                echo "-> $fg[cyan]$P$reset_color <-"
-            else
-                print -P '%B%~%b'
-            fi
-        }
         ;;
 esac
 
@@ -102,10 +100,6 @@ precmd() {
 preexec() {
 
 }
-
-if [ ${IN_NIX_SHELL:-0} = 1 ]; then
-    RPROMPT="%F{202}N%f"
-fi
 
 autoload -Uz add-zsh-hook
 
@@ -165,7 +159,7 @@ rationalise-dot() {
   else
     LBUFFER+=.
   fi
-  zle reset-prompt
+#  zle reset-prompt works badly in eterm
 }
 
 zle -N rationalise-dot
