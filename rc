@@ -241,7 +241,7 @@ alias -g NF='*(.om[1])' # newest file
 
 alias repl='rlwrap with '
 
-[[ whence gpg-connect-agent ]] && gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
+whence gpg-connect-agent && gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
 
 set -K # disable stupid exclamation mark
 
