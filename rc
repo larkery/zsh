@@ -76,7 +76,7 @@ case $TERM in
     *)
         PROMPT=''
         if [[ -n "$SSH_CLIENT" ]]; then
-            PROMPT=$PROMPT'%F{cyan}%U%m%f%k '
+            PROMPT=$PROMPT'%F{cyan}%U%m%u%f '
         fi
         if [[ ! -z $IN_NIX_SHELL ]]; then
             PROMPT=$PROMPT'N '
@@ -241,7 +241,7 @@ alias -g NF='*(.om[1])' # newest file
 
 alias repl='rlwrap with '
 
-gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null || true
+[[ whence gpg-connect-agent ]] && gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
 
 set -K # disable stupid exclamation mark
 
