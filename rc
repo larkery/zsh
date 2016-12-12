@@ -76,7 +76,7 @@ case $TERM in
     *)
         PROMPT=''
         if [[ -n "$SSH_CLIENT" ]]; then
-            PROMPT=$PROMPT'%K{cyan}%U%m%u%k '
+            PROMPT=$PROMPT'%F{cyan}%U%m%f%k '
         fi
         if [[ ! -z $IN_NIX_SHELL ]]; then
             PROMPT=$PROMPT'N '
@@ -89,9 +89,9 @@ esac
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git svn hg
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' formats " %{$fg[green]%}%b%{$reset_color%} %c%u"
-zstyle ':vcs_info:git*:*' unstagedstr "%{$fg[red]%}u%{$reset_color%}"
-zstyle ':vcs_info:git*:*' stagedstr "%{$fg[yellow]%}s%{$reset_color%}"
+zstyle ':vcs_info:*' formats " %{$bg[green]%}%b%{$reset_color%} %c%u"
+zstyle ':vcs_info:git*:*' unstagedstr "%{$bg[red]%}u%{$reset_color%}"
+zstyle ':vcs_info:git*:*' stagedstr "%{$bg[yellow]%}s%{$reset_color%}"
 
 precmd() {
     vcs_info
