@@ -91,7 +91,7 @@ zstyle ':vcs_info:*' enable git svn hg
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' formats " %F{white}%K{black}%b%c%u%k%f"
 zstyle ':vcs_info:git*:*' unstagedstr "%F{red}?%f"
-zstyle ':vcs_info:git*:*' stagedstr "$F{yellow}+%f"
+zstyle ':vcs_info:git*:*' stagedstr "%F{green}+%f"
 
 precmd() {
     vcs_info
