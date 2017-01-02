@@ -108,6 +108,10 @@ add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
 
+if [[ -n $DISPLAY ]]; then
+    add-zsh-hook precmd _xprop_update
+fi
+
 case $TERM in
     eterm*)
         if [[ -d $ZSH/eterm ]]; then
