@@ -68,7 +68,7 @@ SAVEHIST=10000
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # prompt garble
-
+RPROMPT=''
 case $TERM in
     dumb)
         PROMPT='%~ %(?,,[%?] )$ '

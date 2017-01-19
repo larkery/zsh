@@ -5,9 +5,6 @@ _set_title () {
         print -Pn "$name"
         echoti fsl
     fi
-    case "$TERM" in tmux*|screen*)
-        printf '\033k%s\033\\' $(print -Pn "$name")
-    esac
 }
 
 _set_title
