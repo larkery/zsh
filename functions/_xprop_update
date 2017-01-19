@@ -1,0 +1,13 @@
+_xwprop () {
+   xprop -id $WINDOWID -format "$1" 8s -set "$1" "$2"
+}
+
+_xprop_update () {
+   [[ -n $WINDOWID ]] &&
+      { _xwprop "CWD" "$PWD"
+        _xwprop "HOST" "$(hostname)"
+        _xwprop "USER" "$USER"
+      }
+}
+
+_xprop_update

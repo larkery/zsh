@@ -54,15 +54,37 @@ zstyle ':completion:*' separate-sections yes
 
 zstyle :compinstall filename '/home/hinton/.zshrc'
 
-# history
-setopt appendhistory hist_ignore_space hist_ignore_all_dups extendedhistory incappendhistory sharehistory
+## History
+setopt appendhistory
+setopt hist_ignore_space
+setopt extendedhistory
+setopt incappendhistory
 
 HISTFILE=~/.zsh/history
 HISTSIZE=10000
 SAVEHIST=10000
 
-(( $+widgets[history-incremental-pattern-search-backward] )) &&	\
-    bindkey '^r' history-incremental-pattern-search-backward
+if whence hstr >/dev/null; then
+    export HH_CONFIG=hicolor        # get more colors
+    bindkey -s "\C-h" "\eqhh\n"
+fi
+
+# (( $+widgets[history-incremental-pattern-search-backward] )) &&	\
+#     bindkey '^r' history-incremental-pattern-search-backward
+
+function history-incremental-search-backward-buffer () {
+    if [[ -n "$BUFFER" ]]; then
+        zle -U  # this is mad but it works.
+        zle history-incremental-search-backward "$BUFFER"
+    else
+        zle history-incremental-search-backward
+    fi
+}
+
+zle -N history-incremental-search-backward-buffer
+bindkey '^r' history-incremental-search-backward-buffer
+bindkey -M isearch '^r' history-incremental-search-backward
+# repair C-r insertion
 
 # prevent deleting entire paths
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
@@ -107,6 +129,10 @@ add-zsh-hook preexec _start_timer
 add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
+
+if [[ -n $DISPLAY ]]; then
+    add-zsh-hook precmd _xprop_update
+fi
 
 case $TERM in
     eterm*)
@@ -164,33 +190,10 @@ rationalise-dot() {
 
 zle -N rationalise-dot
 bindkey . rationalise-dot
-
-zle -N _history-incremental-pattern-search-backward-with-buffer
-bindkey '^R' _history-incremental-pattern-search-backward-with-buffer
-bindkey -M isearch '^R' history-incremental-search-backward
-
-_up-arrow() {
-    if [[ -z $BUFFER || ($HISTNO != $HISTCMD && $BUFFER = $(fc -l -n $HISTNO $HISTNO)) ]]; then
-        # back in history
-        zle up-line-or-history
-    else
-        # search prefix - however, append from last ;
-        zle _history-incremental-pattern-search-backward-with-buffer
-    fi
-}
-
-zle -N _up-arrow
-
-bindkey "^[[A" _up-arrow
-bindkey "^P" _up-arrow
-bindkey -M isearch "^[[A" history-incremental-search-backward
-bindkey -M isearch "^[[B" history-incremental-search-forward
+bindkey -M isearch . self-insert
 
 DIRSTACKSIZE=8
 setopt autopushd pushdminus pushdsilent pushdtohome
-
-# either run a command or run ls if nothing there
-
 
 zle -N _accept_or_ls
 
