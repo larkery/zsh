@@ -2,7 +2,7 @@ _accept_or_ls () {
     if [[ -z $BUFFER ]]
     then
         echo
-        ls -l --color
+        ls -lh --color
         echo
         precmd
         zle reset-prompt
