@@ -175,15 +175,6 @@ zstyle ':chpwd:*' recent-dirs-default yes
 zstyle ':chpwd:*' recent-dirs-max 50
 zstyle ':completion:*' recent-dirs-insert always
 
-rationalise-dot() {
-  if [[ $LBUFFER = *.. ]]; then
-    LBUFFER+=/..
-  else
-    LBUFFER+=.
-  fi
-#  zle reset-prompt works badly in eterm
-}
-
 goBack () {
     popd >/dev/null
     zle reset-prompt
@@ -198,10 +189,6 @@ zle -N goUp
 bindkey '^[u' goUp
 zle -N goBack
 bindkey '^[i' goBack
-
-zle -N rationalise-dot
-bindkey . rationalise-dot
-bindkey -M isearch . self-insert
 
 DIRSTACKSIZE=8
 setopt autopushd pushdminus pushdsilent pushdtohome
@@ -220,6 +207,8 @@ bindkey "^X^J" _dired
 autoload -Uz copy-earlier-word
 zle -N copy-earlier-word
 bindkey "^[m" copy-earlier-word
+
+bindkey '^Q' push-line-or-edit
 
 _my_cd () {
     _cd
@@ -254,6 +243,9 @@ whence gpg-connect-agent >/dev/null &&
     gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
 
 set -K # disable stupid exclamation mark
+
+unsetopt share_history
+setopt no_share_history
 
 # Local Variables:
 # mode: sh

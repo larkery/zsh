@@ -1,0 +1,40 @@
+if which sqlite3 >/dev/null 2>&1 ; then
+    HISTDB="${HOME}/.zsh/history.db"
+    HISTSESSION=""
+    sqlquote() {
+        sed -e "s/'/''/g" <<< "$1"
+    }
+
+    _create_histdb () {
+        if ! [[ -e "${HISTDB}" ]]; then
+            sqlite3 "$HISTDB" <<-EOF
+           create table hist (
+             id integer primary key,
+             sess integer,
+             cmd text,
+             pwd text,
+             ret integer,
+             start integer,
+             end integer
+           );
+EOF
+        fi
+        HISTSESSION=$(sqlite3 "$HISTDB" 'select 1+max(sess) from hist')
+        HISTSESSION="${HISTSESSION:-0}"
+    }
+
+    zshaddhistory () {
+        _RET=$?
+        _create_histdb
+        sqlite3 "${HISTDB}" <<-EOF
+                insert into hist (sess, cmd, pwd, ret, start, end)
+                values (
+                   $HISTSESSION,
+                   '$(sqlquote "$1")',
+                   '$(sqlquote "$PWD")',
+                   $_RET, $_STARTED, $_FINISHED
+                );
+EOF
+        return 0
+    }
+fi

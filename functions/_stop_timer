@@ -1,10 +1,9 @@
 _stop_timer() {
+    _FINISHED=$(date +%s)
     if ! [ -z "$_STARTED" ]; then
-        NOW=$(date +%s)
-        DELTA=$(($NOW - $_STARTED))
+        DELTA=$(($_FINISHED - $_STARTED))
         if [ $DELTA -gt 5 ]; then
             echo -e "\a$DELTA seconds"
         fi
     fi
-    _STARTED=""
 }
