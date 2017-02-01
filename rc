@@ -244,6 +244,9 @@ whence gpg-connect-agent >/dev/null &&
 
 set -K # disable stupid exclamation mark
 
+source ${ZSH}/self-insert-override.zsh
+source ${ZSH}/sqlite-history.zsh
+
 unsetopt share_history
 setopt no_share_history
 
