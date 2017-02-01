@@ -1,3 +1,4 @@
 _start_timer () {
     _STARTED=$(date +%s)
+    _FINISHED=$_STARTED
 }

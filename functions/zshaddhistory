@@ -19,13 +19,16 @@ if which sqlite3 >/dev/null 2>&1 ; then
            );
 EOF
         fi
-        HISTSESSION=$(sqlite3 "$HISTDB" 'select 1+max(sess) from hist')
-        HISTSESSION="${HISTSESSION:-0}"
+        if [[ -z "$HISTSESSION" ]]; then
+            HISTSESSION=$(sqlite3 "$HISTDB" 'select 1+max(sess) from hist')
+            HISTSESSION="${HISTSESSION:-0}"
+        fi
     }
 
     zshaddhistory () {
         _RET=$?
         _create_histdb
+        [[ -z "$1" ]] ||
         sqlite3 "${HISTDB}" <<-EOF
                 insert into hist (sess, cmd, pwd, ret, start, end)
                 values (
@@ -37,4 +40,57 @@ EOF
 EOF
         return 0
     }
+
+    _search_histdb () {
+        IFS="	" read -r -d '' PWD RET START CMD < \
+           <(sqlite3 -separator $'\t' "${HISTDB}" "select pwd, ret, start, cmd
+from hist where cmd like
+'%$(sqlquote $1)%' order by rowid desc limit 1;")
+        BUFFER="${CMD[0,-2]}"
+    }
+
+    zmodload -i zsh/zleparameter
+
+    for k in $keymaps
+    do
+        if (( $+widgets[self-insert-$k] == 0 ))
+        then zle -A self-insert self-insert-$k
+        fi
+    done
+
+    self-insert-by-keymap() {
+        if (( $+widgets[$WIDGET-$KEYMAP] == 1 ))
+        then zle $WIDGET-$KEYMAP "$@"
+        else zle .$WIDGET "$@"
+        fi
+    }
+
+    zle -N self-insert self-insert-by-keymap
+
+    _histdb_update_result () {
+        _search_histdb "${HISTDB_SEARCH}"
+        POSTDISPLAY="
+search: ${HISTDB_SEARCH}"
+        region_highlight=("${#BUFFER} $((${#BUFFER} + 8)) bold")
+    }
+
+    self-insert-histdb () {
+        HISTDB_SEARCH="${HISTDB_SEARCH}${KEYS}"
+        # TODO handle special keys right
+        _histdb_update_result
+    }
+
+    zle -N self-insert-histdb
+
+    search-histdb () {
+        bindkey -N histdb $KEYMAP
+        HISTDB_SEARCH="$BUFFER"
+        BUFFER=""
+        _histdb_update_result
+        zle recursive-edit -K histdb
+    }
+
+    zle -N search-histdb
+
+    bindkey '^h' search-histdb
 fi
