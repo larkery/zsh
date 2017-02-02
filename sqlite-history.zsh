@@ -4,6 +4,7 @@ typeset -g HISTDB_QUERY=""
 typeset -g HISTDB_FILE="${HOME}/.zsh/history.db"
 typeset -g HISTDB_SESSION=""
 typeset -g HISTDB_MAX_ROWID=""
+typeset -g HISTDB_DIR_FILTER=1
 
 typeset -gA HISTDB_RESULT
 
@@ -58,34 +59,74 @@ _histdb_query () {
     local start
     local cmd
 
-    IFS=$tab read -r -d '' rowid pwd ret start cmd < \
-       <(_histdb -separator $tab \
-                 "select rowid, pwd, ret, start, cmd from hist where $1 limit 1;")
+    if [[ -n "$1" ]]; then
+        IFS=$tab read -r -d '' rowid pwd cmd < \
+           <(_histdb -separator $tab \
+                     "select max(rowid), pwd, cmd from hist where $1 group by pwd, cmd order by $2 limit 1;")
+    fi
 
     HISTDB_RESULT[rowid]="$rowid"
     HISTDB_RESULT[pwd]="$pwd"
-    HISTDB_RESULT[ret]="$ret"
-    HISTDB_RESULT[start]="$start"
     HISTDB_RESULT[cmd]="${cmd[0,-2]}"
 
     return 0
 }
 
-_histdb_gen_sql () {
-    local rowid_part
-    if [[ -n ${HISTDB_MAX_ROWID} ]]; then
-        rowid_part="and rowid < ${HISTDB_MAX_ROWID}"
+_histdb_gen_where () {
+    if [[ -n "$1" ]]; then
+        local where_clause="cmd like '%$(sql_escape $@)%'"
+
+        if [[ -n ${HISTDB_MAX_ROWID} ]]; then
+            where_clause="${where_clause} and rowid < ${HISTDB_MAX_ROWID}"
+        fi
+
+        case ${HISTDB_DIR_FILTER} in
+            1)
+                where_clause="${where_clause} and '$(sql_escape $PWD)' like (pwd || '%')"
+            ;;
+            -1)
+                where_clause="${where_clause} and pwd like '$(sql_escape $PWD)%'"
+            ;;
+        esac
+        if [[ ${HISTDB_DIR_FILTER} != 0 ]]; then
+
+        fi
+
+        echo "${where_clause}"
     fi
-    echo "cmd like '%$(sql_escape $@)%' $rowid_part order by rowid desc"
+}
+
+_histdb_gen_order () {
+    local order_clause="rowid"
+
+    if [[ ${HISTDB_DIR_FILTER} != 0 ]]; then
+        order_clause="-length(pwd), ${order_clause}"
+    fi
+
+    echo "${order_clause} desc"
+}
+
+_histdb_settings () {
+    echo "${HISTDB_DIR_FILTER}"
 }
 
 _histdb_render () {
-    POSTDISPLAY="
->> ${HISTDB_RESULT[cmd]} [${HISTDB_RESULT[pwd]}] ${HISTDB_RESULT[rowid]}"
+    PREDISPLAY="[$(_histdb_settings)] "
+    if [[ -n ${HISTDB_RESULT[rowid]} ]]; then
+        POSTDISPLAY=" : ${HISTDB_RESULT[cmd]} in ${HISTDB_RESULT[pwd]}"
+    else
+        POSTDISPLAY=" : no matches"
+    fi
 }
 
 _histdb_update_state () {
-    _histdb_query "$(_histdb_gen_sql ${BUFFER})"
+    _histdb_query "$(_histdb_gen_where ${BUFFER})" "$(_histdb_gen_order)"
+    if [[ -n "${BUFFER}" ]]; then
+        if [[ -z ${HISTDB_RESULT[rowid]} ]] && [[ $HISTDB_DIR_FILTER != 0 ]]; then
+            HISTDB_DIR_FILTER=0
+            _histdb_query "$(_histdb_gen_where ${BUFFER})" "$(_histdb_gen_order)"
+        fi
+    fi
     _histdb_render
 }
 
@@ -112,6 +153,11 @@ histdb-search () {
     # ideally, iterate on keymap and hook all editing commands to refresh
     _histdb_update_state
     zle recursive-edit -K histdb
+}
+
+histdb () {
+    _histdb -separator "⁣" "select pwd, datetime(max(start), 'unixepoch'), cmd from hist  where cmd like '%$(sql_escape $@)%' group by cmd, pwd order by max(start)" |
+        column -t -s "⁣"
 }
 
 zle -N histdb-backwards
