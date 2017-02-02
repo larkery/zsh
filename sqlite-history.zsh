@@ -3,6 +3,7 @@ which sqlite3 >/dev/null 2>&1 || return;
 typeset -g HISTDB_QUERY=""
 typeset -g HISTDB_FILE="${HOME}/.zsh/history.db"
 typeset -g HISTDB_SESSION=""
+typeset -g HISTDB_MAX_ROWID=""
 
 typeset -gA HISTDB_RESULT
 
@@ -57,10 +58,11 @@ _histdb_query () {
     local start
     local cmd
 
-    IFS=$tab read -r -d '' pwd ret start cmd < \
+    IFS=$tab read -r -d '' rowid pwd ret start cmd < \
        <(_histdb -separator $tab \
-                 "select pwd, ret, start, cmd from hist where $1 limit 1;")
+                 "select rowid, pwd, ret, start, cmd from hist where $1 limit 1;")
 
+    HISTDB_RESULT[rowid]="$rowid"
     HISTDB_RESULT[pwd]="$pwd"
     HISTDB_RESULT[ret]="$ret"
     HISTDB_RESULT[start]="$start"
@@ -70,38 +72,49 @@ _histdb_query () {
 }
 
 _histdb_gen_sql () {
-    echo "cmd like '%$(sql_escape $@)%' order by rowid desc"
+    local rowid_part
+    if [[ -n ${HISTDB_MAX_ROWID} ]]; then
+        rowid_part="and rowid < ${HISTDB_MAX_ROWID}"
+    fi
+    echo "cmd like '%$(sql_escape $@)%' $rowid_part order by rowid desc"
 }
 
 _histdb_render () {
     POSTDISPLAY="
-search: ${HISTDB_QUERY}"
-    BUFFER="${HISTDB_RESULT[cmd]:-no result} [${HISTDB_RESULT[pwd]}]"
+>> ${HISTDB_RESULT[cmd]} [${HISTDB_RESULT[pwd]}] ${HISTDB_RESULT[rowid]}"
 }
 
 _histdb_update_state () {
-    _histdb_query "$(_histdb_gen_sql ${HISTDB_QUERY})"
+    _histdb_query "$(_histdb_gen_sql ${BUFFER})"
     _histdb_render
 }
 
 self-insert-histdb () {
-    HISTDB_QUERY="${HISTDB_QUERY}${KEYS}"
-    # TODO handle backspace etc. because we are using BUFFER to
-    # display the result this is a bit tricky - perhaps it would be
-    # better to use BUFFER to store the query string and to display
-    # the result in PREDISPLAY or POSTDISPLAY.
-
+    zle .self-insert
     _histdb_update_state
+}
+
+histdb-backwards () {
+    HISTDB_MAX_ROWID=${HISTDB_RESULT[rowid]}
+    _histdb_update_state
+    if [[ -z $HISTDB_RESULT[rowid] ]] ; then
+        HISTDB_MAX_ROWID=""
+        _histdb_update_state
+    fi
 }
 
 histdb-search () {
     bindkey -N histdb $KEYMAP
-    HISTDB_QUERY="$BUFFER"
-    BUFFER=""
+    bindkey -M histdb '^h' histdb-backwards
+
+    HISTDB_MAX_ROWID=""
+
+    # ideally, iterate on keymap and hook all editing commands to refresh
     _histdb_update_state
     zle recursive-edit -K histdb
 }
 
+zle -N histdb-backwards
 zle -N self-insert-histdb
 zle -N histdb-search
 
