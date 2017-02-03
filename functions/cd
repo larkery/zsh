@@ -1,5 +1,5 @@
 cd () {
-   if ! ( [ "$#" = 0 ] || [ -e "$1" ]); then
+   if ! ( [ "$#" = 0 ] || [ -e "$1" ] || [[ "$1" = -* ]] || [[ "$1" = ~* ]] ); then
       if read -q "REPLY?mkdir [y/n] "; then
          mkdir -p -- "$1"
       fi

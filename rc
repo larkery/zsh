@@ -4,8 +4,17 @@ if [[ -z $SOURCED_PROFILE ]] && [[ -f "$HOME/profile" ]]; then
     source $HOME/.profile
 fi
 
-# include path
 ZSH=~/.zsh
+
+source ${ZSH}/self-insert-override.zsh
+source ${ZSH}/sqlite-history.zsh
+
+if [[ -f ${ZSH}/${HOST}.zsh ]]; then
+    source ${ZSH}/${HOST}.zsh
+fi
+
+# include path
+
 fpath=( $ZSH/functions "${fpath[@]}" )
 autoload -Uz $ZSH/functions/*(:t)
 
@@ -244,11 +253,10 @@ whence gpg-connect-agent >/dev/null &&
 
 set -K # disable stupid exclamation mark
 
-source ${ZSH}/self-insert-override.zsh
-source ${ZSH}/sqlite-history.zsh
-
 unsetopt share_history
 setopt no_share_history
+
+
 
 # Local Variables:
 # mode: sh
