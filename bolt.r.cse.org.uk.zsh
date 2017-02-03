@@ -1,4 +1,4 @@
-if [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
+if [[ "$TERM" != dumb ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
     # TODO cleanup junk sessions here
     # something like tmux list-windows -a | sort by session |
     tmux list-windows -a -F '#{session_attached} #{session_id} #{window_id} #{session_name}' | sort -r |
