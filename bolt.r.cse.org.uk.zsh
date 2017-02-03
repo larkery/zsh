@@ -27,7 +27,7 @@ if [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
            }
 
     if ! tmux has-session -t main; then
-        exec tmux new-session main
+        exec tmux new-session -s main
     else
         exec tmux new-session -t main
     fi

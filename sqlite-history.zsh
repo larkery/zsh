@@ -168,7 +168,10 @@ histdb () {
         esac
     done
 
-    cols="${cols}, commands.argv as argv, max(start_time) as max_start"
+    sep=$'\x1f'
+    cols="${cols}, replace(commands.argv, '
+', '
+$sep$sep$sep') as argv, max(start_time) as max_start"
 
     local mst="datetime(max_start, 'unixepoch')"
     local dst="datetime('now', 'start of day')"
@@ -189,8 +192,9 @@ limit $limit) order by max_start asc" #TODO limit limits the top
     if [[ $debug = 1 ]]; then
         echo "$query"
     else
-        sep=$'\x1f'
-        _histdb -separator $sep "$query" | column -t -s $sep
+#            sed "/^[0-9]/! s/^/$sep$sep$sep/g" |
+        _histdb -separator $sep "$query" |
+            column -t -s $sep
     fi
 }
 
