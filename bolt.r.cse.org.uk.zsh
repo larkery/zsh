@@ -5,7 +5,7 @@ if [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
         while read -r session; do
             tmux kill-session -t "$session"
         done
-    session=$(tmux-list-session -a -F '#{session_id}' | head -n 1)
+    session=$(tmux-list-sessions -a -F '#{session_id}' | head -n 1)
     if [[ -z $session ]]; then
         exec tmux new-session main
     fi
