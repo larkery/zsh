@@ -79,10 +79,7 @@ histdb () {
 
     zparseopts -E -D -a opts -host+::=hosts -in+::=indirs -at+::=atdirs d s+::=sessions -from:- -until:- -limit:-
 
-    # TODO replace of ~ is a bit wrong
-    # TODO the time calculation here is bound to be a bit slow
-
-    local selcols="session, dir"
+    local selcols="session as ses, dir"
     local cols="session, replace(places.dir, '$HOME', '~') as dir"
     local where="not (commands.argv like 'histdb%')"
     local limit="${LINES:-25}"
@@ -95,7 +92,7 @@ histdb () {
         local hostwhere=""
         for host ($hosts); do
             host="${${host#--host}#=}"
-            hostwhere="${hostwhere}${hostwhere:+ or }places.host='$(sql_escape ${host:-$HOST})'"
+            hostwhere="${hostwhere}${host:+${hostwhere:+ or }places.host='$(sql_escape ${host})'}"
         done
         where="${where}${hostwhere:+ and (${hostwhere})}"
         cols="${cols}, places.host as host"
@@ -175,9 +172,9 @@ $sep$sep$sep') as argv, max(start_time) as max_start"
 
     local mst="datetime(max_start, 'unixepoch')"
     local dst="datetime('now', 'start of day')"
-    local timecol="strftime(case when $mst > $dst then '%H:%M' else '%d/%m' end, max_start, 'unixepoch') as ts"
+    local timecol="strftime(case when $mst > $dst then '%H:%M' else '%d/%m' end, max_start, 'unixepoch') as time"
 
-    selcols="${timecol}, ${selcols}, argv"
+    selcols="${timecol}, ${selcols}, argv as cmd"
 
     query="select ${selcols} from (select ${cols}
 from
@@ -187,18 +184,56 @@ from
 where ${where}
 group by history.command_id, history.place_id
 order by max_start desc
-limit $limit) order by max_start asc" #TODO limit limits the top
+limit $limit) order by max_start asc"
 
     if [[ $debug = 1 ]]; then
         echo "$query"
     else
-#            sed "/^[0-9]/! s/^/$sep$sep$sep/g" |
-        _histdb -separator $sep "$query" |
-            column -t -s $sep
+        _histdb -header -separator $sep "$query" | column -t -s $sep
     fi
+}
+
+# merge two history databases
+
+_histdb_merge () {
+    local first=${1:?two databases required}; shift
+    local second=${1:?two databases required}
+
+    echo "merge $first $second"
+
+    sqlite3 "${first}" <<EOF
+ATTACH DATABASE '${second}' AS o;
+
+-- copy missing commands and places
+INSERT INTO commands (argv) SELECT argv FROM o.commands;
+INSERT INTO places (host, dir) SELECT host, dir FROM o.places;
+
+-- insert missing history, rewriting IDs
+-- could uniquify sessions by host in this way too
+
+INSERT INTO history (session, command_id, place_id, exit_status, start_time, duration)
+SELECT HO.session, C.rowid, P.rowid, HO.exit_status, HO.start_time, HO.duration
+FROM o.history HO
+     LEFT JOIN o.places PO ON HO.place_id = PO.rowid
+     LEFT JOIN o.commands CO ON HO.command_id = CO.rowid
+     LEFT JOIN commands C ON C.argv = CO.argv
+     LEFT JOIN places P ON (P.host = PO.host
+                             AND P.dir = PO.dir)
+WHERE HO.rowid >
+(
+WITH RECURSIVE left (start_time) AS
+  (SELECT history.start_time
+   FROM history LEFT JOIN places ON history.place_id = places.rowid
+   WHERE places.host = ${HISTDB_HOST}),
+right (id, start_time) AS
+  (SELECT o.history.rowid as id, o.history.start_time
+   FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid
+   WHERE o.places.host = ${HISTDB_HOST})
+SELECT max(right.id) FROM left INNER JOIN right ON left.start_time=right.start_time
+)
+;
+EOF
 }
 
 # TODO interactive search
 # TODO more forms of date query?
-
-bindkey '^h' histdb-search

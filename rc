@@ -256,8 +256,6 @@ set -K # disable stupid exclamation mark
 unsetopt share_history
 setopt no_share_history
 
-
-
 # Local Variables:
 # mode: sh
 # End:
