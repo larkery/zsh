@@ -79,15 +79,16 @@ if __name__ == "__main__":
         print('no key with fingerprint %s' % sys.argv[1], file=sys.stderr)
         sys.exit(2)
 
-    print(ssh_key.get_base64(), file=sys.stderr)
     if sys.argv[1] == 'encrypt':
         try:
+            print(sys.argv[1], ssh_key.get_base64(), file=sys.stderr)
             encrypt(ssh_key, sys.stdin.buffer, sys.stdout.buffer)
         except:
             print('an error occurred in encryption', file=sys.stderr)
             sys.exit(1)
     elif sys.argv[1] == 'decrypt':
         try:
+            print(sys.argv[1], ssh_key.get_base64(), file=sys.stderr)
             decrypt(ssh_key, sys.stdin.buffer, sys.stdout.buffer)
         except:
             print('an error occurred in decryption', file=sys.stderr)
