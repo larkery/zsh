@@ -219,17 +219,15 @@ FROM o.history HO
      LEFT JOIN commands C ON C.argv = CO.argv
      LEFT JOIN places P ON (P.host = PO.host
                              AND P.dir = PO.dir)
-WHERE HO.rowid >
+WHERE HO.rowid NOT IN
 (
-WITH RECURSIVE left (start_time) AS
-  (SELECT history.start_time
-   FROM history LEFT JOIN places ON history.place_id = places.rowid
-   WHERE places.host = ${HISTDB_HOST}),
-right (id, start_time) AS
-  (SELECT o.history.rowid as id, o.history.start_time
-   FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid
-   WHERE o.places.host = ${HISTDB_HOST})
-SELECT max(right.id) FROM left INNER JOIN right ON left.start_time=right.start_time
+WITH RECURSIVE left (start_time, host) AS
+  (SELECT history.start_time, places.host
+   FROM history LEFT JOIN places ON history.place_id = places.rowid),
+right (id, start_time, host) AS
+  (SELECT o.history.rowid as id, o.history.start_time, o.places.host
+   FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid)
+SELECT right.id FROM left INNER JOIN right ON left.start_time=right.start_time AND left.host = right.host
 )
 ;
 EOF
