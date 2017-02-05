@@ -196,13 +196,15 @@ limit $limit) order by max_start asc"
 # merge two history databases
 
 _histdb_merge () {
-    local first=${1:?two databases required}; shift
-    local second=${1:?two databases required}
+    local ancestor=${1:?three databases required}; shift
+    local ours=${1:?three databases required}; shift
+    local theirs=${1:?three databases required}
 
-    echo "merge $first $second"
+    echo "merge $ancestor $ours $theirs"
 
-    sqlite3 "${first}" <<EOF
-ATTACH DATABASE '${second}' AS o;
+    sqlite3 "${ours}" <<EOF
+ATTACH DATABASE '${theirs}' AS o;
+ATTACH DATABASE '${ancestor}' AS a;
 
 -- copy missing commands and places
 INSERT INTO commands (argv) SELECT argv FROM o.commands;
@@ -219,19 +221,21 @@ FROM o.history HO
      LEFT JOIN commands C ON C.argv = CO.argv
      LEFT JOIN places P ON (P.host = PO.host
                              AND P.dir = PO.dir)
-WHERE HO.rowid NOT IN
-(
-WITH RECURSIVE left (start_time, host) AS
-  (SELECT history.start_time, places.host
-   FROM history LEFT JOIN places ON history.place_id = places.rowid),
-right (id, start_time, host) AS
-  (SELECT o.history.rowid as id, o.history.start_time, o.places.host
-   FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid)
-SELECT right.id FROM left INNER JOIN right ON left.start_time=right.start_time AND left.host = right.host
-)
+WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
 ;
 EOF
 }
+
+# (
+# WITH RECURSIVE left (start_time, host) AS
+#   (SELECT history.start_time, places.host
+#    FROM history LEFT JOIN places ON history.place_id = places.rowid),
+# right (id, start_time, host) AS
+#   (SELECT o.history.rowid as id, o.history.start_time, o.places.host
+#    FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid)
+# SELECT right.id FROM left INNER JOIN right ON left.start_time=right.start_time AND left.host = right.host
+# )
+
 
 # TODO interactive search
 # TODO more forms of date query?

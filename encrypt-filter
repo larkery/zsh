@@ -70,26 +70,31 @@ if __name__ == "__main__":
               file=sys.stderr)
         sys.exit(3)
 
+    target_key = sys.argv[1]
+    mode = sys.argv[2]
+
     agent = paramiko.Agent()
     for key in agent.get_keys():
-        if key.get_base64() == sys.argv[1]:
+        if key.get_base64() == target_key:
             ssh_key = key
             break
     else:
-        print('no key with fingerprint %s' % sys.argv[1], file=sys.stderr)
-        sys.exit(2)
+        print('no key with fingerprint %s' % target_key, file=sys.stderr)
+        sys.exit(1)
 
-    if sys.argv[1] == 'encrypt':
-        try:
-            print(sys.argv[1], ssh_key.get_base64(), file=sys.stderr)
+    try:
+        #print(mode, target_key, file=sys.stderr)
+        if mode == 'encrypt':
             encrypt(ssh_key, sys.stdin.buffer, sys.stdout.buffer)
-        except:
-            print('an error occurred in encryption', file=sys.stderr)
-            sys.exit(1)
-    elif sys.argv[1] == 'decrypt':
-        try:
-            print(sys.argv[1], ssh_key.get_base64(), file=sys.stderr)
+        elif mode == 'decrypt':
             decrypt(ssh_key, sys.stdin.buffer, sys.stdout.buffer)
-        except:
-            print('an error occurred in decryption', file=sys.stderr)
-            sys.exit(1)
+        else:
+            print('unknown mode %s' % (mode, ), file=sys.stderr)
+            sys.exit(3)
+        sys.stdout.buffer.flush()
+    except:
+        e = sys.exc_info()
+        print('%s occurred in %s' % (e[0], mode, ), file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        sys.exit(2)
