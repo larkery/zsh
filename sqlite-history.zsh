@@ -38,9 +38,20 @@ EOF
     fi
 }
 
+declare -a _BORING_COMMANDS
+_BORING_COMMANDS=("^ls$" "^cd$" "^ " "^histdb" "^top$" "^htop$")
+
 zshaddhistory () {
     local retval=$?
-    local cmd="'$(sql_escape ${1[0, -2]})'"
+    local cmd="${1[0, -2]}"
+
+    for boring ($_BORING_COMMANDS); do
+        if [[ "$cmd" =~ $boring ]]; then
+            return 0
+        fi
+    done
+
+    local cmd="'$(sql_escape $cmd)'"
     local pwd="'$(sql_escape ${PWD})'"
     local now="${_FINISHED:-$(date +%s)}"
     local started=${_STARTED:-${now}}
