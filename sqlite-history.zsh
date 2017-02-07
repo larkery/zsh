@@ -52,7 +52,7 @@ zshaddhistory () {
     done
 
     if [[ $PWD = "$HOME/.zsh" ]]; then
-        return 2
+        return 0
     fi
 
     local cmd="'$(sql_escape $cmd)'"
