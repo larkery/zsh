@@ -1,7 +1,7 @@
 which sqlite3 >/dev/null 2>&1 || return;
 
 typeset -g HISTDB_QUERY=""
-typeset -g HISTDB_FILE="${HOME}/.zsh/history.db"
+typeset -g HISTDB_FILE="${HOME}/.history/zsh-history.db"
 typeset -g HISTDB_SESSION=""
 typeset -g HISTDB_MAX_ROWID=""
 typeset -g HISTDB_HOST=""
@@ -51,7 +51,7 @@ zshaddhistory () {
         fi
     done
 
-    if [[ $PWD = "$HOME/.zsh" ]]; then
+    if [[ $PWD = "$HOME/.history" ]]; then
         return 0
     fi
 

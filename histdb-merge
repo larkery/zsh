@@ -4,18 +4,12 @@ local ancestor=${1:?three databases required}; shift
 local ours=${1:?three databases required}; shift
 local theirs=${1:?three databases required}
 
-export HISTKEY=$(< ~/.zsh/history-password)
-
 # for reasons I cannot use the encryption filter here.
 # most annoying.
-local tmp=$(mktemp -d)
-openssl aes-256-cbc -d -a -in "$ancestor" -out "${tmp}/ancestor" -pass env:HISTKEY
-openssl aes-256-cbc -d -a -in "$theirs" -out "${tmp}/theirs" -pass env:HISTKEY
-openssl aes-256-cbc -d -a -in "$ours" -out "${tmp}/ours" -pass env:HISTKEY
 
-sqlite3 "${tmp}/ours" <<EOF
-ATTACH DATABASE '${tmp}/theirs' AS o;
-ATTACH DATABASE '${tmp}/ancestor' AS a;
+sqlite3 "${ours}" <<EOF
+ATTACH DATABASE '${theirs}' AS o;
+ATTACH DATABASE '${ancestor}' AS a;
 
 -- copy missing commands and places
 INSERT INTO commands (argv) SELECT argv FROM o.commands;
@@ -35,9 +29,3 @@ AND P.dir = PO.dir)
 WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
 ;
 EOF
-
-echo "encrypting ${tmp}/ours"
-enc=$(mktemp)
-openssl aes-256-cbc -a -in "${tmp}/ours" -pass env:HISTKEY -out "${enc}"
-mv -- "$enc" "$ours"
-exit 0
