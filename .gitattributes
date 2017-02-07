@@ -1,1 +1,2 @@
 history.db merge=histdb filter=encrypt
+history-password filter=sshcrypt
