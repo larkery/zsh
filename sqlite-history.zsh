@@ -51,6 +51,10 @@ zshaddhistory () {
         fi
     done
 
+    if [[ $PWD = "$HOME/.zsh" ]]; then
+        return 2
+    fi
+
     local cmd="'$(sql_escape $cmd)'"
     local pwd="'$(sql_escape ${PWD})'"
     local now="${_FINISHED:-$(date +%s)}"
