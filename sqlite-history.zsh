@@ -253,9 +253,13 @@ _histdb_merge () {
 
     # for reasons I cannot use the encryption filter here.
     # most annoying.
+    echo "decrypting $ancestor"
     openssl aes-256-cbc -d -a -salt -in "$ancestor" -out "$ancestor" -pass env:HISTKEY
+    echo "decrypting $theirs"
     openssl aes-256-cbc -d -a -salt -in "$theirs" -out "$theirs" -pass env:HISTKEY
+    echo "decrypting $ours"
     openssl aes-256-cbc -d -a -salt -in "$ours" -out "$ours" -pass env:HISTKEY
+    echo "merging $ours $(file $ours)"
 
     sqlite3 "${ours}" <<EOF
 ATTACH DATABASE '${theirs}' AS o;
@@ -280,6 +284,7 @@ WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
 ;
 EOF
 
+    echo "encrypting $ours"
     openssl aes-256-cbc -a -in "$ours" -out "$ours" -pass env:HISTKEY
 }
 
