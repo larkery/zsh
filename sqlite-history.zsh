@@ -253,17 +253,14 @@ _histdb_merge () {
 
     # for reasons I cannot use the encryption filter here.
     # most annoying.
-    echo "decrypting $ancestor"
-    openssl aes-256-cbc -d -a -salt -in "$ancestor" -out "$ancestor" -pass env:HISTKEY
-    echo "decrypting $theirs"
-    openssl aes-256-cbc -d -a -salt -in "$theirs" -out "$theirs" -pass env:HISTKEY
-    echo "decrypting $ours"
-    openssl aes-256-cbc -d -a -salt -in "$ours" -out "$ours" -pass env:HISTKEY
-    echo "merging $ours $(file $ours)"
+    local tmp=$(mktemp -d)
+    openssl aes-256-cbc -d -a -salt -in "$ancestor" -out "${tmp}/ancestor" -pass env:HISTKEY
+    openssl aes-256-cbc -d -a -salt -in "$theirs" -out "${tmp}/theirs" -pass env:HISTKEY
+    openssl aes-256-cbc -d -a -salt -in "$ours" -out "${tmp}/ours" -pass env:HISTKEY
 
-    sqlite3 "${ours}" <<EOF
-ATTACH DATABASE '${theirs}' AS o;
-ATTACH DATABASE '${ancestor}' AS a;
+    sqlite3 "${tmp}/ours" <<EOF
+ATTACH DATABASE '${tmp}/theirs' AS o;
+ATTACH DATABASE '${tmp}/ancestor' AS a;
 
 -- copy missing commands and places
 INSERT INTO commands (argv) SELECT argv FROM o.commands;
@@ -284,8 +281,8 @@ WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
 ;
 EOF
 
-    echo "encrypting $ours"
-    openssl aes-256-cbc -a -in "$ours" -out "$ours" -pass env:HISTKEY
+    echo "encrypting ${tmp}/ours"
+    openssl aes-256-cbc -a -in "${tmp}/ours" -pass env:HISTKEY > "$ours"
 }
 
 # (
