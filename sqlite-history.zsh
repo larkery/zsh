@@ -13,7 +13,7 @@ sql_escape () {
 }
 
 _histdb () {
-    [[ -e ${HISTDB_FILE} ]] && sqlite3 "${HISTDB_FILE}" "$@"
+    sqlite3 "${HISTDB_FILE}" "$@"
     [[ "$?" -ne 0 ]] && echo "error in $@"
 }
 
@@ -244,57 +244,3 @@ limit $limit) order by max_start asc"
 
 # merge encrypted history databases
 
-_histdb_merge () {
-    local ancestor=${1:?three databases required}; shift
-    local ours=${1:?three databases required}; shift
-    local theirs=${1:?three databases required}
-
-    export HISTKEY=$(< ~/.zsh/history-password)
-
-    # for reasons I cannot use the encryption filter here.
-    # most annoying.
-    local tmp=$(mktemp -d)
-    openssl aes-256-cbc -d -a -in "$ancestor" -out "${tmp}/ancestor" -pass env:HISTKEY
-    openssl aes-256-cbc -d -a -in "$theirs" -out "${tmp}/theirs" -pass env:HISTKEY
-    openssl aes-256-cbc -d -a -in "$ours" -out "${tmp}/ours" -pass env:HISTKEY
-
-    sqlite3 "${tmp}/ours" <<EOF
-ATTACH DATABASE '${tmp}/theirs' AS o;
-ATTACH DATABASE '${tmp}/ancestor' AS a;
-
--- copy missing commands and places
-INSERT INTO commands (argv) SELECT argv FROM o.commands;
-INSERT INTO places (host, dir) SELECT host, dir FROM o.places;
-
--- insert missing history, rewriting IDs
--- could uniquify sessions by host in this way too
-
-INSERT INTO history (session, command_id, place_id, exit_status, start_time, duration)
-SELECT HO.session, C.rowid, P.rowid, HO.exit_status, HO.start_time, HO.duration
-FROM o.history HO
-     LEFT JOIN o.places PO ON HO.place_id = PO.rowid
-     LEFT JOIN o.commands CO ON HO.command_id = CO.rowid
-     LEFT JOIN commands C ON C.argv = CO.argv
-     LEFT JOIN places P ON (P.host = PO.host
-                             AND P.dir = PO.dir)
-WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
-;
-EOF
-
-    echo "encrypting ${tmp}/ours"
-    openssl aes-256-cbc -a -in "${tmp}/ours" -pass env:HISTKEY > "$ours"
-}
-
-# (
-# WITH RECURSIVE left (start_time, host) AS
-#   (SELECT history.start_time, places.host
-#    FROM history LEFT JOIN places ON history.place_id = places.rowid),
-# right (id, start_time, host) AS
-#   (SELECT o.history.rowid as id, o.history.start_time, o.places.host
-#    FROM o.history LEFT JOIN o.places ON o.history.place_id = o.places.rowid)
-# SELECT right.id FROM left INNER JOIN right ON left.start_time=right.start_time AND left.host = right.host
-# )
-
-
-# TODO interactive search
-# TODO more forms of date query?
