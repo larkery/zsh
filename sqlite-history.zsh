@@ -116,7 +116,13 @@ histdb () {
     local -a atdirs
     local -a sessions
 
-    zparseopts -E -D -a opts -host+::=hosts -in+::=indirs -at+::=atdirs d s+::=sessions -from:- -until:- -limit:-
+    zparseopts -E -D -a opts \
+               -host+::=hosts \
+               -in+::=indirs \
+               -at+::=atdirs \
+               d \
+               s+::=sessions \
+               -from:- -until:- -limit:-
 
     local selcols="session as ses, dir"
     local cols="session, replace(places.dir, '$HOME', '~') as dir"
@@ -239,6 +245,8 @@ _histdb_merge () {
     local ours=${1:?three databases required}; shift
     local theirs=${1:?three databases required}
     KEY="AAAAB3NzaC1yc2EAAAADAQABAAABAQC8B1DrrW4CIKEu+ZLkvk8C+1cdgMLHoDUpIzFaWhOiRimpsZ9KAX9a4LY0oCYziWCfxIKYILtz+Z93O/7zEyTQSa1Hu0ygh5t05qBY//o7NwhdvMikw5mGEgEcXgE8VC0tlfgZmz+c7n0sRwAQW2Gezqo9L5LhKaxtpNXWcYP/RYahR/RYqG7nK/cErurNG2qZznawWFnYivB+MSX2J3dl0dJXe8zsLmKens0wuDbsxoRJrvL24TlPktXWzGz324PEiCK5lvGdbl/s6wVAzJHHagqyschqGq7NXyI+jNUgJB8SxisHjYDq6LOJyc2i6VXZ39N1oqcDZ3I1QF78s0tD"
+    # for reasons I cannot use the encryption filter here.
+    # most annoying.
     ~/.zsh/encrypt-filter "$KEY" decrypt < "$ancestor" | cat > "$ancestor"
     ~/.zsh/encrypt-filter "$KEY" decrypt < "$ours" | cat > "$ours"
     ~/.zsh/encrypt-filter "$KEY" decrypt < "$theirs" | cat > "$theirs"
