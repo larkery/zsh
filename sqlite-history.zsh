@@ -13,7 +13,7 @@ sql_escape () {
 }
 
 _histdb () {
-    sqlite3 "${HISTDB_FILE}" "$@"
+    [[ -e ${HISTDB_FILE} ]] && sqlite3 "${HISTDB_FILE}" "$@"
     [[ "$?" -ne 0 ]] && echo "error in $@"
 }
 
