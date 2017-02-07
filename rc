@@ -6,9 +6,6 @@ fi
 
 ZSH=~/.zsh
 
-source ${ZSH}/self-insert-override.zsh
-source ${ZSH}/sqlite-history.zsh
-
 if [[ -f ${ZSH}/${HOST}.zsh ]]; then
     source ${ZSH}/${HOST}.zsh
 fi
@@ -17,6 +14,37 @@ fi
 
 fpath=( $ZSH/functions "${fpath[@]}" )
 autoload -Uz $ZSH/functions/*(:t)
+
+## History
+setopt appendhistory
+setopt hist_ignore_space
+setopt extendedhistory
+setopt incappendhistory
+
+if [ "$HISTFILE" = "$HOME/.zsh_history" ]; then
+    HISTFILE=~/.zsh/history
+fi
+HISTSIZE=10000
+SAVEHIST=10000
+
+source ${ZSH}/self-insert-override.zsh
+source ${ZSH}/sqlite-history.zsh
+
+export ALTERNATE_EDITOR=""
+export EDITOR="emacsclient"
+export VISUAL="emacsclient -c"
+
+unsetopt share_history
+setopt no_share_history
+
+whence gpg-connect-agent >/dev/null &&
+    gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
+
+set -K # disable stupid exclamation mark
+
+if [[ $TERM = dumb ]]; then
+    return
+fi
 
 # options
 setopt autocd nobeep extendedglob nomatch prompt_subst menu_complete re_match_pcre
@@ -62,18 +90,6 @@ zstyle ':completion:*:default' list-colors \
 zstyle ':completion:*' separate-sections yes
 
 zstyle :compinstall filename '/home/hinton/.zshrc'
-
-## History
-setopt appendhistory
-setopt hist_ignore_space
-setopt extendedhistory
-setopt incappendhistory
-
-if [ "$HISTFILE" = "$HOME/.zsh_history" ]; then
-    HISTFILE=~/.zsh/history
-fi
-HISTSIZE=10000
-SAVEHIST=10000
 
 function history-incremental-search-backward-buffer () {
     if [[ -n "$BUFFER" ]]; then
@@ -134,21 +150,6 @@ add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
 
-if [[ -n $DISPLAY ]]; then
-    add-zsh-hook precmd _xprop_update
-fi
-
-case $TERM in
-    eterm*)
-        if [[ -d $ZSH/eterm ]]; then
-            fpath=( $ZSH/eterm "${fpath[@]}" )
-            autoload -Uz $ZSH/eterm/*(:t)
-            add-zsh-hook precmd _eterm_update
-            _eterm_update
-        fi
-        ;;
-esac
-
 autoload edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
@@ -163,10 +164,6 @@ alias ecn='emacsclient -c -n'
 alias grep='grep --color=auto'
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
-
-o() {
-    xdg-open "$@" &|
-}
 
 alias -s org=o
 alias -s pdf=o
@@ -235,10 +232,6 @@ compdef '_my_cp' cp
 
 alias edit="emacsclient -c"
 
-export ALTERNATE_EDITOR=""
-export EDITOR="emacsclient"
-export VISUAL="emacsclient -c"
-
 zle -C hist-complete complete-word _generic
 zstyle ':completion:hist-complete:*' completer _history
 bindkey "^X^R" hist-complete
@@ -248,13 +241,7 @@ alias -g NF='*(.om[1])' # newest file
 
 alias repl='rlwrap with '
 
-whence gpg-connect-agent >/dev/null &&
-    gpg-connect-agent -q updatestartuptty /bye 2>&1 >/dev/null
 
-set -K # disable stupid exclamation mark
-
-unsetopt share_history
-setopt no_share_history
 
 # Local Variables:
 # mode: sh

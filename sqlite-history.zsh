@@ -81,7 +81,35 @@ where
     return 0
 }
 
+histdb-top () {
+    _histdb_init
+    local sep=$'\x1f'
+    local field
+    local join
+    local table
+    1=${1:-cmd}
+    case "$1" in
+        dir)
+            field=places.dir
+            join='places.rowid = history.place_id'
+            table=places
+            ;;
+        cmd)
+            field=commands.argv
+            join='commands.rowid = history.command_id'
+            table=commands
+            ;;;
+    esac
+    _histdb -separator "$sep" \
+            -header \
+            "select count(*) as count, places.host, replace($field, '
+', '
+$sep$sep') as ${1:-cmd} from history left join commands on history.command_id=commands.rowid left join places on history.place_id=places.rowid group by places.host, $field order by count(*)" |
+        column -t -s "$sep"
+}
+
 histdb () {
+    _histdb_init
     local -a opts
     local -a hosts
     local -a indirs
