@@ -232,14 +232,16 @@ limit $limit) order by max_start asc"
     fi
 }
 
-# merge two history databases
+# merge encrypted history databases
 
 _histdb_merge () {
     local ancestor=${1:?three databases required}; shift
     local ours=${1:?three databases required}; shift
     local theirs=${1:?three databases required}
-
-    echo "merge $ancestor $ours $theirs"
+    KEY="AAAAB3NzaC1yc2EAAAADAQABAAABAQC8B1DrrW4CIKEu+ZLkvk8C+1cdgMLHoDUpIzFaWhOiRimpsZ9KAX9a4LY0oCYziWCfxIKYILtz+Z93O/7zEyTQSa1Hu0ygh5t05qBY//o7NwhdvMikw5mGEgEcXgE8VC0tlfgZmz+c7n0sRwAQW2Gezqo9L5LhKaxtpNXWcYP/RYahR/RYqG7nK/cErurNG2qZznawWFnYivB+MSX2J3dl0dJXe8zsLmKens0wuDbsxoRJrvL24TlPktXWzGz324PEiCK5lvGdbl/s6wVAzJHHagqyschqGq7NXyI+jNUgJB8SxisHjYDq6LOJyc2i6VXZ39N1oqcDZ3I1QF78s0tD"
+    $ZSH/encrypt-filter "$KEY" decrypt "$ancestor" | cat > "$ancestor"
+    $ZSH/encrypt-filter "$KEY" decrypt "$ours" | cat > "$ours"
+    $ZSH/encrypt-filter "$KEY" decrypt "$theirs" | cat > "$theirs"
 
     sqlite3 "${ours}" <<EOF
 ATTACH DATABASE '${theirs}' AS o;
@@ -263,6 +265,8 @@ FROM o.history HO
 WHERE HO.rowid > (SELECT MAX(rowid) FROM a.history)
 ;
 EOF
+
+    $ZSH/encrypt-filter "$KEY" encrypt "$ours" | cat > "$ours"
 }
 
 # (
