@@ -8,16 +8,16 @@ _stop_timer() {
             HOURS=0
             DAYS=0
             if [ $SECONDS -ge 60 ]; then
-                SECONDS=$((SECONDS % 60))
                 MINUTES=$((SECONDS / 60))
+                SECONDS=$((SECONDS % 60))
             fi
             if [ $MINUTES -ge 60 ]; then
-                MINUTES=$((MINUTES % 60))
                 HOURS=$((HOURS / 60))
+                MINUTES=$((MINUTES % 60))
             fi
             if [ $HOURS -ge 24 ]; then
-                HOURS=$((HOURS % 24))
                 DAYS=$((HOURS / 24))
+                HOURS=$((HOURS % 24))
             fi
             echo -e "\a${DAYS}d ${HOURS}h ${MINUTES}m ${SECONDS}s"
         fi
