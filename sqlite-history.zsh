@@ -254,9 +254,9 @@ _histdb_merge () {
     # for reasons I cannot use the encryption filter here.
     # most annoying.
     local tmp=$(mktemp -d)
-    openssl aes-256-cbc -d -a -salt -in "$ancestor" -out "${tmp}/ancestor" -pass env:HISTKEY
-    openssl aes-256-cbc -d -a -salt -in "$theirs" -out "${tmp}/theirs" -pass env:HISTKEY
-    openssl aes-256-cbc -d -a -salt -in "$ours" -out "${tmp}/ours" -pass env:HISTKEY
+    openssl aes-256-cbc -d -a -in "$ancestor" -out "${tmp}/ancestor" -pass env:HISTKEY
+    openssl aes-256-cbc -d -a -in "$theirs" -out "${tmp}/theirs" -pass env:HISTKEY
+    openssl aes-256-cbc -d -a -in "$ours" -out "${tmp}/ours" -pass env:HISTKEY
 
     sqlite3 "${tmp}/ours" <<EOF
 ATTACH DATABASE '${tmp}/theirs' AS o;
