@@ -1,8 +1,14 @@
 cd () {
-   if ! ( [ "$#" = 0 ] || [ -e "$1" ] || [[ "$1" = -* ]] || [[ "$1" = ~* ]] ); then
-      if read -q "REPLY?mkdir [y/n] "; then
-         mkdir -p -- "$1"
-      fi
-   fi
-   builtin cd "$@"
+    if [ $# = 0 ] || [ -d "$1" ] || [[ "$1" = -* ]] || [[ "$1" = ~* ]]; then
+        builtin cd "$@"
+    elif [ -e "$1" ] && [ -f "$1" ]; then
+        builtin cd "$(dirname -- $1)"
+    elif ! [ -e "$1" ]; then
+        if read -q "REPLY?mkdir [y/n] "; then
+            mkdir -p -- "$1"
+        fi
+        builtin cd "$@"
+    else
+        builtin cd "$@"
+    fi
 }
