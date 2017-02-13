@@ -241,8 +241,6 @@ alias -g NF='*(.om[1])' # newest file
 
 alias repl='rlwrap with '
 
-
-
 # Local Variables:
 # mode: sh
 # End:
