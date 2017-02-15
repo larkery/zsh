@@ -165,10 +165,10 @@ alias grep='grep --color=auto'
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
 
-alias -s org=o
-alias -s pdf=o
-alias -s jpg=o
-alias -s png=o
+alias -s org=xdg-open
+alias -s pdf=xdg-open
+alias -s jpg=xdg-open
+alias -s png=xdg-open
 
 MARKPATH=$ZSH/run/marks
 bookmark -l
