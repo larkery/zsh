@@ -1,5 +1,2 @@
-xman () {
-   emacsclient -n -c -e "(man  \"$1\")"
-}
-
 compdef '_dispatch man man' xman
+emacsclient -n -e "(xman \"$*\")"
