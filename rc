@@ -162,6 +162,7 @@ alias add='paste -s -d+|bc'
 alias tab='cut -d "	" -f '
 alias ecn='emacsclient -c -n'
 alias grep='grep --color=auto'
+alias mkpatch='diff -Naur'
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
 
