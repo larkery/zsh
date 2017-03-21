@@ -1,0 +1,4 @@
+curl http://open.live.bbc.co.uk/weather/feeds/en/2654675/3dayforecast.rss 2>/dev/null |
+   xmlstarlet sel -t -m "//item" -v title -n |
+   perl -nE 'say "$1|$2|$4-$3" if /(.+): (.+), .+Temperature: (.+) \(.+Temperature: (.+) /' |
+   column -t -s '|'
