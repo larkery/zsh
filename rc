@@ -124,7 +124,7 @@ case $TERM in
             PROMPT=$PROMPT'N '
         fi
         PROMPT=$PROMPT'%B%~%b'"\${vcs_info_msg_0_}
-%B%(?,,%F{red}[%?]%f )$%b "
+%B%(?,,%F{magenta}[%?]%f )$%b "
         ;;
 esac
 
