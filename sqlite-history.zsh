@@ -19,6 +19,14 @@ _histdb () {
 
 _histdb_init () {
     if ! [[ -e "${HISTDB_FILE}" ]]; then
+        local DN="$(dirname ${HISTDB_FILE})"
+        if ! [[ -d $DN ]]; then
+            mkdir -p -- $DN
+            pushd $DN
+            git init
+            git config merge.histdb.driver "$HOME/.zsh/histdb-merge %O %A %B"
+            popd
+        fi
         _histdb <<-EOF
 create table commands (argv text, unique(argv) on conflict ignore);
 create table places   (host text, dir text, unique(host, dir) on conflict ignore);
@@ -124,9 +132,21 @@ histdb () {
                -host+::=hosts \
                -in+::=indirs \
                -at+::=atdirs \
-               d \
+               d h -help \
                s+::=sessions \
                -from:- -until:- -limit:-
+
+    usage="usage:$0 [--host] [--in] [--at] [-s n]+* [--from] [--until] [--limit] query
+    --host    print the host column and show all hosts (otherwise current host)
+    --host=x  find entries from host x
+    --in      find only entries run in the current dir or below
+    --in=x    find only entries in directory x or below
+    --at      like --in, but excluding subdirectories
+    -s n      only show session n
+    -d        debug output query that will be run
+    --from=x  only show commands after date x (sqlite date parser)
+    --until=x only show commands before date x (sqlite date parser)
+    --limit=n only show n rows. defaults to $LINES or 25"
 
     local selcols="session as ses, dir"
     local cols="session, replace(places.dir, '$HOME', '~') as dir"
@@ -204,9 +224,13 @@ histdb () {
                         ;;
                 esac
                 where="${where} and datetime(start_time, 'unixepoch') <= $until"
-            ;;
+                ;;
             -d)
                 debug=1
+                ;;
+            -h|--help)
+                echo "$usage"
+                return 0
                 ;;
             --limit=*)
                 limit=${opt#--limit=}
