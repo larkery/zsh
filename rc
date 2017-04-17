@@ -28,7 +28,7 @@ HISTSIZE=10000
 SAVEHIST=10000
 
 source ${ZSH}/self-insert-override.zsh
-source ${ZSH}/sqlite-history.zsh
+source ${ZSH}/zsh-histdb/sqlite-history.zsh
 
 export ALTERNATE_EDITOR=""
 export EDITOR="emacsclient"
