@@ -1,7 +1,6 @@
 if [[ "$TERM" != dumb ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
     tmux start
-    # TODO cleanup junk sessions here
-    # something like tmux list-windows -a | sort by session |
+
     tmux list-windows -a -F '#{session_attached} #{session_id} #{window_id} #{session_name}' | sort -r |
         () { local -A window_sessions
              local -A all_sessions
@@ -27,7 +26,7 @@ if [[ "$TERM" != dumb ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
              done
            }
     if ! tmux has-session -t main; then
-        exec tmux new-session -sA main
+        exec tmux new-session -s main
     else
         exec tmux new-session -t main
     fi
