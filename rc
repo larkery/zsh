@@ -27,8 +27,8 @@ fi
 HISTSIZE=10000
 SAVEHIST=10000
 
-source ${ZSH}/self-insert-override.zsh
-source ${ZSH}/sqlite-history.zsh
+#source ${ZSH}/self-insert-override.zsh
+source ${ZSH}/zsh-histdb/sqlite-history.zsh
 
 export ALTERNATE_EDITOR=""
 export EDITOR="emacsclient"
@@ -163,6 +163,7 @@ alias tab='cut -d "	" -f '
 alias ecn='emacsclient -c -n'
 alias grep='grep --color=auto'
 alias mkpatch='diff -Naur'
+alias cal='cal -yw --color'
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
 
@@ -240,6 +241,7 @@ bindkey "^X^R" hist-complete
 alias -g ND='*(/om[1])' # newest directory
 alias -g NF='*(.om[1])' # newest file
 
+alias look='xdg-open -rules ~/.config/look-rules'
 alias repl='rlwrap with '
 
 # Local Variables:
