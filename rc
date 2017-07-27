@@ -6,6 +6,8 @@ fi
 
 ZSH=~/.zsh
 
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
+
 if [[ -f ${ZSH}/${HOST}.zsh ]]; then
     source ${ZSH}/${HOST}.zsh
 fi
@@ -42,9 +44,7 @@ whence gpg-connect-agent >/dev/null &&
 
 set -K # disable stupid exclamation mark
 
-if [[ $TERM = dumb ]]; then
-    return
-fi
+
 
 # options
 setopt autocd nobeep extendedglob nomatch prompt_subst menu_complete re_match_pcre
