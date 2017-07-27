@@ -137,6 +137,9 @@ zstyle ':vcs_info:git*:*' stagedstr "%F{green}+%f"
 
 precmd() {
     vcs_info
+    if    ls -1qA ~/.msmtp.queue/ | grep -q .; then
+        echo "unsent mails..."
+    fi
 }
 
 preexec() {
@@ -243,6 +246,8 @@ alias -g NF='*(.om[1])' # newest file
 
 alias look='xdg-open -rules ~/.config/look-rules'
 alias repl='rlwrap with '
+
+compdef _gnu_generic msmtp-queue
 
 # Local Variables:
 # mode: sh

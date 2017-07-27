@@ -12,7 +12,7 @@ _stop_timer() {
                 SECONDS=$((SECONDS % 60))
             fi
             if [ $MINUTES -ge 60 ]; then
-                HOURS=$((HOURS / 60))
+                HOURS=$((MINUTES / 60))
                 MINUTES=$((MINUTES % 60))
             fi
             if [ $HOURS -ge 24 ]; then
