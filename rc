@@ -153,6 +153,15 @@ add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
 
+if [ -n "$TMUX" ]; then
+    refresh-environment () {
+        export $(tmux show-environment | grep "^SSH_AUTH_SOCK")
+        export $(tmux show-environment | grep "^DISPLAY")
+    }
+
+    add-zsh-hook preexec refresh-environment
+fi
+
 autoload edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
