@@ -155,8 +155,7 @@ add-zsh-hook preexec _set_title
 
 if [ -n "$TMUX" ]; then
     refresh-environment () {
-        export $(tmux show-environment | grep "^SSH_AUTH_SOCK")
-        export $(tmux show-environment | grep "^DISPLAY")
+        export $(tmux show-environment | grep '^\(SSH_AUTH_SOCK\|DISPLAY\)') >/dev/null
     }
 
     add-zsh-hook preexec refresh-environment
