@@ -166,7 +166,7 @@ zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
 # command aliases
-alias ls='ls -h --color=auto'
+alias ls='TIME_STYLE=long-iso BLOCK_SIZE=1 ls -h --color=auto'
 alias l='ls -l'
 alias la='l -a'
 alias add='paste -s -d+|bc'
