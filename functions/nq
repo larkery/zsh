@@ -2,7 +2,14 @@ local CACHE="$HOME/.cache/nq-cache"
 if ! ( [ -e $CACHE ] && [ $(stat -c %Y $CACHE) -gt $(( $(date +%s) - 3600 )) ] ); then
    echo "update cache" && nix-env -qa --json > "$CACHE"
 fi
-jq -r 'to_entries | .[] | .key + "|" + .value.meta.description' < "$CACHE" |
+GET=.value.name
+
+if [[ $1 == "-A" ]]; then
+   GET=.key
+   shift
+fi
+
+jq -r 'to_entries | .[] | '$GET' + "|" + .value.meta.description' < "$CACHE" |
         {
            if [ $# -gt 0 ]; then
               # double grep because coloring breaks column's char count
