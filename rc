@@ -153,6 +153,7 @@ add-zsh-hook preexec _start_timer
 add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
+add-zsh-hook precmd histdb-update-outcome
 
 if [ -n "$TMUX" ]; then
     refresh-environment () {
