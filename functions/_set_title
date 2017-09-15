@@ -1,8 +1,14 @@
 _set_title () {
-    name="${1:-%~}"
+    name="$1"
+
     if [[ -n "$terminfo[fsl]" ]] && [[ -n "$terminfo[tsl]" ]]; then
         echoti tsl
-        print -Pn "$name"
+        if [[ -z "$name" ]]; then
+           print -Pn "zsh: %~"
+        else
+           print -n "$name"
+        fi
+
         echoti fsl
     fi
 }
