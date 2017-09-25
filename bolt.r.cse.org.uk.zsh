@@ -30,7 +30,7 @@ if [[ "$TERM" != dumb ]] && [[ -z "$TMUX" ]] && [[ -n "$SSH_CONNECTION" ]]; then
     else
         local main_attached=$(tmux list-sessions -F '#{session_name} #{session_attached}' | grep main)
         if [[ $main_attached == "main 1" ]]; then
-            exec tmux new-session -t main \; set-option destroy-unattached
+            exec tmux new-session -t main \; set-option destroy-unattached \; new-window
         else
             exec tmux attach -t main
         fi
