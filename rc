@@ -177,6 +177,17 @@ alias ecn='emacsclient -c -n'
 alias grep='grep --color=auto'
 alias mkpatch='diff -Naur'
 alias cal='cal -yw --color'
+alias clojure='rlwrap clojure'
+lein() {
+    case $1 in
+        figwheel)
+            command rlwrap lein "$@"
+            ;;
+        *)
+            command lein "$@"
+            ;;
+    esac
+}
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
 
