@@ -3,5 +3,5 @@ bolt () {
 }
 
 bertha () {
-    xfreerdp /v:bertha.cse.org.uk /u:tomh /d:CSE /p:$(passm -p webmail.cse.org.uk)
+    xfreerdp /v:bertha.cse.org.uk /u:tomh /d:CSE /p:$(passm -p cse.org.uk)
 }
