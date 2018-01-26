@@ -1,0 +1,6 @@
+WORD_SRC=https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
+WORDS=$HOME/.cache/eff_large_wordlist.txt
+
+[ -f $WORDS ] || curl -s $WORD_SRC > $WORDS
+
+sort -R $WORDS | head -n ${1:-6} | cut -f2 | paste -sd ' '
