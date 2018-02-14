@@ -1,12 +1,43 @@
 local CACHE="$HOME/.cache/nq-cache"
-if ! ( [ -e $CACHE ] && [ $(stat -c %Y $CACHE) -gt $(( $(date +%s) - 3600 )) ] ); then
-   echo "update cache" && nix-env -qa --json > "$CACHE"
-fi
-GET=.value.name
+local INPUTS="$HOME/.cache/nq-inputs"
+local -a opts
+local GET
 
-if [[ $1 == "-A" ]]; then
-   GET=.key
-   shift
+get_inputs () {
+find -L $HOME/.nix-defexpr -maxdepth 2 -iname nixos -exec readlink '{}' ';'
+}
+
+if ! ( [[ -s $CACHE ]] && [[ "$(cat $INPUTS)" == "$(get_inputs)" ]] ); then
+   echo "update cache" && nix-env -qa --json > "$CACHE"
+   get_inputs > "$INPUTS"
+fi
+
+zparseopts -D -a opts n a v h -help -version -name -attr
+
+for opt in $opts; do
+    case $opt in
+        -h|--help)
+            echo "usage: nq [-a] [-n] [-v] search terms"
+            echo "  -a : show attribute path"
+            echo "  -n : show name"
+            echo "  -v : show version"
+            return 1
+            ;;
+        -n|--name)
+            GET="$GET${GET:++\"|\"+}.value.name"
+            ;;
+        -a|--attr)
+            GET="$GET${GET:++\"|\"+}.key"
+            ;;
+        -v|--version)
+            GET="$GET${GET:++\"|\"+}.value.meta.version"
+            ;;
+        *)
+    esac
+done
+
+if [[ -z "$GET" ]]; then
+    GET=.value.name
 fi
 
 jq -r 'to_entries | .[] | '$GET' + "|" + .value.meta.description' < "$CACHE" |
@@ -14,7 +45,7 @@ jq -r 'to_entries | .[] | '$GET' + "|" + .value.meta.description' < "$CACHE" |
            if [ $# -gt 0 ]; then
               # double grep because coloring breaks column's char count
               # $* so that we include spaces (could do .* instead?)
-                grep -i "$*" | column -t -s "|" | grep --color=always -i "$*"
+                grep -i -- "$*" | column -t -s "|" | grep --color=always -i -- "$*"
            else
                 column -t -s "|"
            fi
