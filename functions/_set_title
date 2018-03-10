@@ -1,16 +1,23 @@
+
+case $TERM in
+    xterm*|rxvt*)
+        TSL='\e]0;'
+        FSL='\a'
+        ;;
+    *)
+        TSL=$(tput tsl)
+        FSL=$(tput fsl)
+        ;;
+esac
+
 _set_title () {
     name="$1"
 
-    if [[ -n "$terminfo[fsl]" ]] && [[ -n "$terminfo[tsl]" ]]; then
-        echoti tsl
-        if [[ -z "$name" ]]; then
-           print -Pn "zsh: %~"
-        else
-           print -n "$name"
-        fi
-
-        echoti fsl
+    if [[ -z "$name" ]]; then
+        print -Pn $TSL"zsh: %~"$FSL
+    else
+        print -n $TSL"$name"$FSL
     fi
 }
 
-_set_title
+_set_title "$@"
