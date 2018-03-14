@@ -47,7 +47,7 @@ set -K # disable stupid exclamation mark
 
 
 # options
-setopt autocd nobeep extendedglob nomatch prompt_subst menu_complete re_match_pcre
+setopt autocd nobeep extendedglob nomatch prompt_subst re_match_pcre
 setopt longlistjobs checkjobs noflowcontrol
 unsetopt notify
 
@@ -59,35 +59,24 @@ compinit
 
 autoload -U colors && colors
 
-# completion settings
-zstyle -e ':completion:*' completer '
-  if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
-    _last_try="$HISTNO$BUFFER$CURSOR"
-    reply=(_complete _match _prefix)
-  else
-    reply=(_ignored _correct _approximate)
-  fi'
+setopt complete_in_word nolistambiguous
+setopt menu_complete
 
-zstyle ':completion:*' max-errors 1
-zstyle ':completion:*' file-sort name
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more%s
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-zstyle ':completion:*' menu select=1 _complete _ignored _approximate
-zstyle ':completion:*' select-prompt %Sscrolled %p%s
-zstyle ':completion:*' verbose true
-zstyle ':completion:*:descriptions' format '%B%F{blue}%d%f%b'
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*:kill:*' force-list always
-zstyle ':completion:*:processes' command "ps -eo pid,user,comm,cmd -w -w"
-zstyle ':completion:*:functions' ignored-patterns '_*'
-# not sure about this
-zstyle ':completion:*:default' list-colors \
-       ${(s.:.)LS_COLORS}
-# this is bad.
-#zstyle ':completion:*' recursive-files '*/.git/*'
-zstyle ':completion:*' separate-sections yes
+zstyle ':completion:*' completer _expand _complete _match _approximate
+zstyle ':completion:*' add-space true
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*:*:*:*:*' menu select=2
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
+
+zstyle ':completion:*:matches' group 'yes'
+zstyle ':completion:*:descriptions' format "%{${fg_bold[magenta]}%}%d:%{$reset_color%}"
+zstyle ':completion:*' group-name ""
+zstyle ':completion:*' accept-exact '*(N)'
+
+zstyle ':completion:*:manuals' separate-sections true
+zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 zstyle :compinstall filename '/home/hinton/.zshrc'
 
