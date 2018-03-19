@@ -1,26 +1,20 @@
-local CACHE="$HOME/.cache/nq-cache"
 local INPUTS="$HOME/.cache/nq-inputs"
 local -a opts
 local GET
+local inpath="nixos"
 
-get_inputs () {
-find -L $HOME/.nix-defexpr -maxdepth 2 -iname nixos -exec readlink '{}' ';'
-}
+zparseopts -D -a opts n a A: v h -help -version -name -attr
 
-if ! ( [[ -s $CACHE ]] && [[ "$(cat $INPUTS)" == "$(get_inputs)" ]] ); then
-   echo "update cache" && nix-env -qa --json > "$CACHE"
-   get_inputs > "$INPUTS"
-fi
-
-zparseopts -D -a opts n a v h -help -version -name -attr
-
-for opt in $opts; do
+while [[ $#opts -gt 0 ]]; do
+    opt=$opts[1]
+    shift opts
     case $opt in
         -h|--help)
             echo "usage: nq [-a] [-n] [-v] search terms"
             echo "  -a : show attribute path"
             echo "  -n : show name"
             echo "  -v : show version"
+            echo "  -A <path> : look in subpath (e.g. luaPackages, ...)"
             return 1
             ;;
         -n|--name)
@@ -32,9 +26,24 @@ for opt in $opts; do
         -v|--version)
             GET="$GET${GET:++\"|\"+}.value.meta.version"
             ;;
+        -A)
+            inpath=$opts[1]
+            shift opts
+            ;;
         *)
     esac
 done
+
+local CACHE="$HOME/.cache/nq-cache-${inpath}"
+
+get_inputs () {
+    find -L $HOME/.nix-defexpr -maxdepth 2 -iname nixos -exec readlink '{}' ';'
+}
+
+if ! ( [[ -s $CACHE ]] && [[ "$(cat $INPUTS)" == "$(get_inputs)" ]] ); then
+   echo "update cache" && nix-env -qa --json -A $inpath > "$CACHE"
+   get_inputs > "$INPUTS"
+fi
 
 if [[ -z "$GET" ]]; then
     GET=.value.name
