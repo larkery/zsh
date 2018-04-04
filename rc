@@ -29,8 +29,8 @@ fi
 HISTSIZE=10000
 SAVEHIST=10000
 
-#source ${ZSH}/self-insert-override.zsh
 source ${ZSH}/zsh-histdb/sqlite-history.zsh
+source ${ZSH}/zsh-histdb/histdb-interactive.zsh
 
 export ALTERNATE_EDITOR=""
 export EDITOR="emacsclient"
@@ -80,20 +80,7 @@ zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 zstyle :compinstall filename '/home/hinton/.zshrc'
 
-function history-incremental-search-backward-buffer () {
-    if [[ -n "$BUFFER" ]]; then
-        zle -U  # this is mad but it works.
-        zle history-incremental-search-backward "$BUFFER"
-    else
-        zle history-incremental-search-backward
-    fi
-}
-
-zle -N history-incremental-search-backward-buffer
-bindkey '^r' history-incremental-search-backward-buffer
-bindkey -M isearch '^r' history-incremental-search-backward
-bindkey -M isearch '^s' history-incremental-search-forward
-# repair C-r insertion
+bindkey '^r' _histdb-isearch
 
 # prevent deleting entire paths
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
