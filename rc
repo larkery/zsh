@@ -44,8 +44,6 @@ whence gpg-connect-agent >/dev/null &&
 
 set -K # disable stupid exclamation mark
 
-
-
 # options
 setopt autocd nobeep extendedglob nomatch prompt_subst re_match_pcre
 setopt longlistjobs checkjobs noflowcontrol

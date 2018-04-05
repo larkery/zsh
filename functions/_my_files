@@ -1,6 +1,5 @@
 _my_files () {
     _named_directories
-    values=(${${(f)"$(cdr -l)"}##<-> ##})
-    values=(${values[1,9]})
-    _wanted -V recent-dirs expl 'recent directory' compadd -S '' -Q -a values
+    values=(${(f)"$(histdb-frecent-dirs $PREFIX)"})
+    _wanted -V recent-dirs expl 'histdb' compadd -S '' -Q -a values
 }
