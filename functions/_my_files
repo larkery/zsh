@@ -3,5 +3,5 @@ _my_files () {
     values=(${(f)"$(histdb-frecent-dirs $PREFIX)"})
     local expl
     _tags recent-directories
-    _requested recent-directories expl 'recent directory' compadd -U -a values
+    _requested -V recent-directories expl 'recent directory' compadd -U -a values
 }
