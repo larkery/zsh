@@ -1,5 +1,7 @@
 _my_files () {
     _named_directories
     values=(${(f)"$(histdb-frecent-dirs $PREFIX)"})
-    _wanted -V recent-dirs expl 'histdb' compadd -S '' -Q -a values
+    local expl
+    _tags recent-directories
+    _requested recent-directories expl 'recent directory' compadd -U -a values
 }
