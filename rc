@@ -60,7 +60,7 @@ autoload -U colors && colors
 setopt complete_in_word nolistambiguous
 setopt menu_complete
 
-zstyle ':completion:*' completer _expand _complete _match _approximate
+zstyle ':completion:*' completer _expand _complete _match #_approximate
 zstyle ':completion:*' add-space true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*:*:*:*:*' menu select=2
