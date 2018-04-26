@@ -81,7 +81,7 @@ zstyle :compinstall filename '/home/hinton/.zshrc'
 bindkey '^r' _histdb-isearch
 
 # prevent deleting entire paths
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+WORDCHARS='*?[]~=&;!#$%^(){}<>'
 
 # prompt garble
 RPROMPT=''
