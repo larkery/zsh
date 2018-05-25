@@ -244,6 +244,10 @@ alias repl='rlwrap with '
 
 compdef _gnu_generic msmtp-queue
 
+unalias run-help
+run-help () {
+    man "$@" || \ "$1" --help | less
+}
 # Local Variables:
 # mode: sh
 # End:
