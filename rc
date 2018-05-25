@@ -64,7 +64,7 @@ zstyle ':completion:*' completer _expand _complete _match #_approximate
 zstyle ':completion:*' add-space true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*:*:*:*:*' menu select=2
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:default' list-colors ''
 
 zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 
