@@ -1,2 +1,0 @@
-compdef '_dispatch man man' xman
-emacsclient -n -e "(xman \"$*\")"
