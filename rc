@@ -244,6 +244,8 @@ alias repl='rlwrap with '
 
 compdef _gnu_generic msmtp-queue
 
+zstyle ':completion:*' rehash true
+
 unalias run-help
 run-help () {
     man "$@" || \ "$1" --help | less
