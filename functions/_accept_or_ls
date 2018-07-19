@@ -1,12 +1,10 @@
-_accept_or_ls () {
-    if [[ -z $BUFFER ]]
-    then
-        echo
-        ls -lh --color
-        echo
-        precmd
-        zle reset-prompt
-    else
-        zle accept-line
-    fi
-}
+if [[ -z $BUFFER ]]
+then
+    echo
+    ls -lh --color
+    echo
+    precmd
+    zle reset-prompt
+else
+    zle accept-line
+fi

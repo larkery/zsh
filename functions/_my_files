@@ -1,11 +1,13 @@
 frecent-dirs "blah blah blah" # trigger autoload, the command sub doesn't
 
 _my_files () {
+    _wanted directories expl 'removable disk' _path_files -g "/run/media/hinton/*" -
     _named_directories
     values=(${(f)"$(frecent-dirs $PREFIX)"})
     local expl
     _tags recent-directories
     _requested -V recent-directories expl 'recent directory' compadd -U -a values
+    
 }
 
 _my_files

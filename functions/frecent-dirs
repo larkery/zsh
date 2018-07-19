@@ -10,7 +10,7 @@ and places.dir != '$(sql_escape $PWD)'
 and places.dir like '%$(sql_escape ${1:-${PWD}})%'
 group by places.dir
 order by sum(1000.0/($now - history.start_time)) desc
-limit 100
+limit 25
 " | while read d; do
         ( [[ $d = "/net/*" ]] || [[ -d $d ]] ) && echo $d
     done

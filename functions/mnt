@@ -1,7 +1,0 @@
-mnt() {
-    [ ! -d /run/media/hinton/"$1" ] && \
-        udisksctl mount --block-device /dev/disk/by-label/"$1"
-    cd /run/media/hinton/"$1"
-}
-
-compdef '_files -W /dev/disk/by-label' mnt

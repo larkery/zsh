@@ -201,14 +201,9 @@ setopt autopushd pushdminus pushdsilent pushdtohome
 
 zle -N _accept_or_ls
 
-_dired() {
-    xdg-open . &|
-}
-
 zle -N _dired
 
 bindkey "^M" _accept_or_ls
-bindkey "^X^J" _dired
 
 autoload -Uz copy-earlier-word
 zle -N copy-earlier-word

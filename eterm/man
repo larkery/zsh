@@ -1,9 +1,0 @@
-man () {
-   if [[ "$1" = "configuration.nix" ]]; then
-      command man "$@"
-   else
-      # TODO handle sections?
-      # TODO is woman better?
-      emacsclient -e "(man \"$1\")"
-   fi
-}
