@@ -151,6 +151,7 @@ alias mkpatch='diff -Naur'
 alias cal='cal -yw --color'
 alias clojure='rlwrap clojure'
 alias mkdir='mkdir -p -v'
+alias copy='rsync -a --info=progress2 --no-i-r -h'
 
 lein() {
     case $1 in
