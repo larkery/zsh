@@ -152,6 +152,7 @@ alias cal='cal -yw --color'
 alias clojure='rlwrap clojure'
 alias mkdir='mkdir -p -v'
 alias copy='rsync -a --info=progress2 --no-i-r -h'
+alias pgrep='pgrep -a'
 
 lein() {
     case $1 in
