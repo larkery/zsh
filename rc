@@ -60,12 +60,16 @@ autoload -U colors && colors
 setopt complete_in_word nolistambiguous
 setopt menu_complete
 
-zstyle ':completion:*' completer _expand _complete _match #_approximate
+zstyle ':completion:*' rehash true
+
+zstyle ':completion:*' completer _complete _ignored
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3)) numeric)'
 zstyle ':completion:*' add-space true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*:*:*:*:*' menu select=2
 zstyle ':completion:*:default' list-colors ''
-
+# match from middle of strings?
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|=* r:|=*'
 zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 
 zstyle ':completion:*:matches' group 'yes'
@@ -77,6 +81,20 @@ zstyle ':completion:*:manuals' separate-sections true
 zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 zstyle :compinstall filename '/home/hinton/.zshrc'
+
+_my_cd () {
+    _cd
+    _my_files    
+}
+
+compdef '_my_cd' cd
+
+_my_cp () {
+    _cp
+    _my_files
+}
+
+compdef '_my_cp' cp
 
 bindkey '^r' _histdb-isearch
 
@@ -142,7 +160,7 @@ zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
 # command aliases
-alias ls='TIME_STYLE=long-iso BLOCK_SIZE=1 ls -h --color=auto'
+alias ls='TIME_STYLE=long-iso BLOCK_SIZE=1 ls -h --color=auto -v'
 alias l='ls -l'
 alias la='l -a'
 alias ecn='emacsclient -c -n'
@@ -153,6 +171,7 @@ alias clojure='rlwrap clojure'
 alias mkdir='mkdir -p -v'
 alias copy='rsync -a --info=progress2 --no-i-r -h'
 alias pgrep='pgrep -a'
+export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init'
 
 lein() {
     case $1 in
@@ -213,40 +232,20 @@ bindkey "^[m" copy-earlier-word
 
 bindkey '^Q' push-line-or-edit
 
-_my_cd () {
-    _cd
-    _my_files
-}
-
-compdef '_my_cd' cd
-
-_my_cp () {
-    _cp
-    _my_files
-}
-
-compdef '_my_cp' cp
-
 alias edit="emacsclient -c"
-
-zle -C hist-complete complete-word _generic
-zstyle ':completion:hist-complete:*' completer _history
-bindkey "^X^R" hist-complete
 
 alias -g ND='*(/om[1])' # newest directory
 alias -g NF='*(.om[1])' # newest file
 
-alias look='xdg-open -rules ~/.config/look-rules'
-alias repl='rlwrap with '
-
 compdef _gnu_generic msmtp-queue
-
-zstyle ':completion:*' rehash true
 
 unalias run-help
 run-help () {
     man "$@" || \ "$1" --help | less
 }
+zmodload zsh/complist
+bindkey -M menuselect '^o' accept-and-infer-next-history
 # Local Variables:
 # mode: sh
 # End:
+
