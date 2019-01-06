@@ -60,6 +60,8 @@ autoload -U colors && colors
 setopt complete_in_word nolistambiguous
 setopt menu_complete
 
+setopt magic_equal_subst
+
 zstyle ':completion:*' rehash true
 
 zstyle ':completion:*' completer _complete _ignored
