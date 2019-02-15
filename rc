@@ -173,7 +173,7 @@ alias clojure='rlwrap clojure'
 alias mkdir='mkdir -p -v'
 alias copy='rsync -a --info=progress2 --no-i-r -h'
 alias pgrep='pgrep -a'
-export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init'
+export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init -R'
 
 lein() {
     case $1 in
