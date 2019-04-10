@@ -46,7 +46,7 @@ if ! ( [[ -s $CACHE ]] && [[ "$(cat $INPUTS)" == "$(get_inputs)" ]] ); then
 fi
 
 if [[ -z "$GET" ]]; then
-    GET=.value.key
+    GET=.key
 fi
 
 jq -r 'to_entries | .[] | '$GET' + "|" + .value.meta.description' < "$CACHE" |
