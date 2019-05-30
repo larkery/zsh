@@ -1,0 +1,21 @@
+typeset -ga SHELF
+SHELF=()
+
+shelf () {
+    if [[ $1 = "-p" ]]; then
+        print $SHELF
+    elif [[ $# -gt 0 ]]; then
+        for f in $@; do
+            SHELF=($(realpath "$f") $SHELF)
+        done
+        
+        print "shelf: $SHELF" >&2
+    else
+        local pop=${SHELF[1]}
+        SHELF=(${SHELF:1})
+        print "shelf: $SHELF" >&2
+        echo -nE "${pop}"
+    fi
+}
+
+shelf $@
