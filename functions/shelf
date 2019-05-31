@@ -13,7 +13,7 @@ shelf () {
     else
         local pop=${SHELF[1]}
         SHELF=(${SHELF:1})
-        print "shelf: $SHELF" >&2
+        print "pop: $pop shelf: $SHELF" >&2
         echo -nE "${pop}"
     fi
 }
