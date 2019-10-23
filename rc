@@ -50,6 +50,7 @@ setopt longlistjobs checkjobs noflowcontrol
 unsetopt notify
 
 autoload -U zutil
+autoload -U zmv
 
 autoload compinit
 autoload -U complist
