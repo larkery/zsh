@@ -52,6 +52,7 @@ setopt longlistjobs checkjobs noflowcontrol
 unsetopt notify
 
 autoload -U zutil
+autoload -U zmv
 
 autoload compinit
 autoload -U complist
@@ -175,6 +176,7 @@ alias mkdir='mkdir -p -v'
 alias copy='rsync -a --info=progress2 --no-i-r -h'
 alias pgrep='pgrep -a'
 alias nn='notmuch new'
+alias serve='webfsd -F -l -'
 
 export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init -R'
 
@@ -251,6 +253,9 @@ run-help () {
 }
 zmodload zsh/complist
 bindkey -M menuselect '^o' accept-and-infer-next-history
+
+eval "$(direnv hook zsh)"
+
 # Local Variables:
 # mode: sh
 # End:
