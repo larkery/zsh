@@ -134,7 +134,7 @@ zstyle ':vcs_info:*' disable-patterns "$HOME/net(|/*)" "/net(|/*)"
 precmd() {
     vcs_info
     if    ls -1qA ~/.msmtp.queue/ | grep -q .; then
-        echo "unsent mails..."
+        echo "unsent mails - msmtp-queue -r"
     fi
 }
 
@@ -175,7 +175,7 @@ alias copy='rsync -a --info=progress2 --no-i-r -h'
 alias pgrep='pgrep -a'
 alias nn='notmuch new'
 alias serve='webfsd -F -l -'
-
+alias ip='ip -c'
 export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init -R'
 
 lein() {
