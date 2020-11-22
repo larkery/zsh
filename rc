@@ -242,8 +242,6 @@ run-help () {
 zmodload zsh/complist
 bindkey -M menuselect '^o' accept-and-infer-next-history
 
-eval "$(direnv hook zsh)"
-
 # Local Variables:
 # mode: sh
 # End:
