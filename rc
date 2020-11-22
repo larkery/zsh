@@ -144,11 +144,8 @@ preexec() {
 
 autoload -Uz add-zsh-hook
 
-add-zsh-hook preexec _start_timer
-add-zsh-hook precmd _stop_timer
 add-zsh-hook precmd _set_title
 add-zsh-hook preexec _set_title
-add-zsh-hook precmd histdb-update-outcome
 
 if [ -n "$TMUX" ]; then
     refresh-environment () {
@@ -176,18 +173,9 @@ alias pgrep='pgrep -a'
 alias nn='notmuch new'
 alias serve='webfsd -F -l -'
 alias ip='ip -c'
-export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init -R'
+alias nix-shell='nix-shell --command zsh'
 
-lein() {
-    case $1 in
-        figwheel)
-            command rlwrap lein "$@"
-            ;;
-        *)
-            command lein "$@"
-            ;;
-    esac
-}
+export LESS='--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --tabs=4 --no-init -R'
 
 alias javadebug='java -agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=y'
 
