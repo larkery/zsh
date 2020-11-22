@@ -4,6 +4,8 @@ if [[ -z $SOURCED_PROFILE ]] && [[ -f "$HOME/profile" ]]; then
     source $HOME/.profile
 fi
 
+eval "$(direnv hook zsh)"
+
 ZSH=~/.zsh
 
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
