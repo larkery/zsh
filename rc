@@ -6,7 +6,7 @@ fi
 
 eval "$(direnv hook zsh)"
 
-ZSH=~/.zsh
+ZSH=$ZDOTDIR
 
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
@@ -26,7 +26,7 @@ setopt extendedhistory
 setopt incappendhistory
 
 if [ "$HISTFILE" = "$HOME/.zsh_history" ]; then
-    HISTFILE=~/.zsh/history
+    HISTFILE=$ZSH/history
 fi
 HISTSIZE=10000
 SAVEHIST=10000
@@ -135,9 +135,9 @@ zstyle ':vcs_info:*' disable-patterns "$HOME/net(|/*)" "/net(|/*)"
 
 precmd() {
     vcs_info
-    if    ls -1qA ~/.msmtp.queue/ | grep -q .; then
-        echo "unsent mails - msmtp-queue -r"
-    fi
+#     if    ls -1qA ~/.msmtp.queue/ | grep -q .; then
+#         echo "unsent mails - msmtp-queue -r"
+#     fi
 }
 
 preexec() {
